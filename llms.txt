@@ -1,0 +1,17 @@
+# Megan’s Macaw Aviary
+
+> Macaw adoption in Raleigh, North Carolina. Hand-raised, socialized macaws raised in a home environment: blue-and-gold, green-winged, military, hyacinth and scarlet macaws. Visits are by appointment. Contact by phone or text at +1 805-259-3980.
+
+## Main pages
+
+- [Home](https://megansmacawsaviary.vercel.app/): Overview of the aviary and how to get started.
+- [Available macaws](https://megansmacawsaviary.vercel.app/available): Birds listed as available, reserved or sold.
+- [Learn](https://megansmacawsaviary.vercel.app/learn): Whether a macaw is right for you, species guide, care and health, how adoption works, and common questions.
+- [Contact](https://megansmacawsaviary.vercel.app/contact): Call, text or message Megan.
+
+## Policies
+
+- [Privacy Policy](https://megansmacawsaviary.vercel.app/privacy)
+- [Terms of Use](https://megansmacawsaviary.vercel.app/terms)
+- [Cookie Policy](https://megansmacawsaviary.vercel.app/cookies)
+- [Accessibility Statement](https://megansmacawsaviary.vercel.app/accessibility)

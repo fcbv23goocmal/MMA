@@ -1,0 +1,6 @@
+setup.mjs
+README.md
+.gitignore
+.env*
+*.zip
+*.map

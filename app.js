@@ -1,9 +1,16 @@
 (function(){
 var C=window.SITE||{},$=function(i){return document.getElementById(i)},all=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
 var IMG={bg:"bg",bg2:"bg2",sc:"sc",gw:"gw",mil:"mil",hya:"hya"};function src(k){return"/img/"+k+".jpg"}
-function link(t,u){var a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener";a.textContent=t;return a}
+function link(t,u){var a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener noreferrer";a.textContent=t;return a}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+/* config values are validated before use: https links only, simple email and phone formats */
+function safeUrl(u){try{var x=new URL(String(u||""));return x.protocol==="https:"?x.href:""}catch(e){return ""}}
+function safeEmail(v){v=String(v||"").trim();return /^[^\s@<>"',;:]+@[^\s@<>"',;:]+\.[A-Za-z]{2,}$/.test(v)&&v.length<=120?v:""}
+function safePhone(v){v=String(v||"");return /^\+?[0-9]{7,15}$/.test(v)?v:""}
+function clean(v,n){return String(v||"").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F\u202A-\u202E\u2066-\u2069]/g,"").slice(0,n)}
+C={PHONE:safePhone(C.PHONE),EMAIL:safeEmail(C.EMAIL),INSTAGRAM:safeUrl(C.INSTAGRAM),FACEBOOK:safeUrl(C.FACEBOOK),GOOGLE_REVIEWS:safeUrl(C.GOOGLE_REVIEWS)};
 /* reviews, socials, email from config.js */
-all(".js-reviews").forEach(function(a){if(C.GOOGLE_REVIEWS)a.href=C.GOOGLE_REVIEWS;else{a.removeAttribute("target");a.outerHTML="<span>"+a.textContent+"</span>"}});
+all(".js-reviews").forEach(function(a){if(C.GOOGLE_REVIEWS)a.href=C.GOOGLE_REVIEWS;else a.replaceWith(el("span",null,a.textContent))});
 var soc=[["Instagram",C.INSTAGRAM],["Facebook",C.FACEBOOK]].filter(function(x){return x[1]});
 all(".js-social").forEach(function(el){
   soc.forEach(function(x,k){if(k)el.appendChild(document.createTextNode(" · "));el.appendChild(link(x[0],x[1]))});
@@ -22,9 +29,9 @@ var slide=$("slide");
 if(slide){
   var S=[{n:"Blue-and-gold macaw",d:"Friendly, bold and a classic family favorite.",s:"Ara ararauna",k:"bg"},{n:"Military macaw",d:"Calm green giant with a gentle, curious nature.",s:"Ara militaris",k:"mil"},{n:"Hyacinth macaw",d:"The largest parrot: deep cobalt, gentle and affectionate.",s:"Anodorhynchus hyacinthinus",k:"hya"},{n:"Scarlet macaw",d:"Brilliant red, yellow and blue with a big personality.",s:"Ara macao",k:"sc"}];
   var i=0,dots=$("dots");
-  slide.innerHTML="";
+  slide.textContent="";
   var L=S.map(function(s,k){var im=document.createElement("img");im.alt="";im.decoding="async";im.width=800;im.height=800;if(k)im.loading="lazy";im.src=src(s.k);slide.appendChild(im);dots.appendChild(document.createElement("span"));return im});
-  slide.insertAdjacentHTML("beforeend",'<span class="cap"><b></b><small></small><em></em></span>');
+  var cap=el("span","cap");cap.appendChild(el("b"));cap.appendChild(el("small"));cap.appendChild(el("em"));slide.appendChild(cap);
   var draw=function(){var s=S[i];L.forEach(function(im,k){im.classList.toggle("on",k===i)});
     slide.querySelector("b").textContent=s.n;slide.querySelector("small").textContent=s.s;slide.querySelector("em").textContent=s.d;
     slide.setAttribute("aria-label",s.n+". Show next macaw");
@@ -47,13 +54,12 @@ if(grid){
     {id:"b6",species:"Green-winged macaw",sci:"Ara chloropterus",img:"gw",age:"Juvenile, about 8 months",status:"sold"}];
   var LABEL={available:"Available",reserved:"Reserved",sold:"Sold"},filter="all",cnt=$("av-count"),emp=$("av-empty");
   var render=function(){
-    var list=BIRDS.filter(function(b){return filter==="all"||b.status===filter});grid.innerHTML="";
+    var list=BIRDS.filter(function(b){return filter==="all"||b.status===filter});grid.textContent="";
     list.forEach(function(b){
       var art=document.createElement("article");art.className="bird"+(b.status==="sold"?" sold":"");art.id="bird-"+b.id;
       var note=b.status==="sold"?"I'm interested in a "+b.species+" like the one listed as sold.":"I'm asking about the "+b.species+" ("+b.age+", "+LABEL[b.status].toLowerCase()+").";
-      art.innerHTML='<div class="ph"><img loading="lazy" decoding="async" width="800" height="800"><span class="badge s-'+b.status+'"></span></div><div class="bb"><h3></h3><small></small><p class="age"></p><a class="btn"></a></div>';
-      var im=art.querySelector("img");im.src=src(b.img);im.alt=b.species;
-      art.querySelector(".badge").textContent=LABEL[b.status];art.querySelector("h3").textContent=b.species;art.querySelector("small").textContent=b.sci;art.querySelector(".age").textContent=b.age;
+      var ph=el("div","ph"),im=document.createElement("img");im.loading="lazy";im.decoding="async";im.width=800;im.height=800;im.src=src(b.img);im.alt=b.species+", "+b.age.toLowerCase();ph.appendChild(im);ph.appendChild(el("span","badge s-"+b.status,LABEL[b.status]));
+      var bb=el("div","bb");bb.appendChild(el("h3",null,b.species));bb.appendChild(el("small",null,b.sci));bb.appendChild(el("p","age",b.age));bb.appendChild(el("a","btn"));art.appendChild(ph);art.appendChild(bb);
       var a=art.querySelector(".btn");if(b.status==="sold")a.classList.add("alt");a.textContent=b.status==="sold"?"Ask about similar birds":"Ask about this bird";
       a.href="/contact?bird="+encodeURIComponent(b.species)+"&note="+encodeURIComponent(note);
       grid.appendChild(art)});
@@ -71,7 +77,7 @@ var sendB=$("m-send");
 if(sendB){
   var sel=$("m-bird"),txt=$("m-text"),nameEl=$("m-name"),st=$("m-status"),emailBtn=$("m-email"),q=new URLSearchParams(location.search);
   var qb=q.get("bird");if(qb)all("#m-bird option").forEach(function(o){if(o.text===qb)sel.value=o.text});
-  if(q.get("note"))txt.value=q.get("note").slice(0,400);
+  if(q.get("note"))txt.value=clean(q.get("note"),400);
   if(C.EMAIL){emailBtn.hidden=false;emailBtn.className="btn";sendB.className="btn alt"}
   else document.querySelector(".msg small").textContent="Texting opens the Messages app on a phone. On a computer, copy the message or call. Nothing is sent until you press send.";
   var say=function(t){st.textContent=t;if(t)setTimeout(function(){if(st.textContent===t)st.textContent=""},6000)};
@@ -81,16 +87,16 @@ if(sendB){
   var valid=function(){var a=!!nameEl.value.trim(),b=!!txt.value.trim();
     setErr(nameEl,"e-name",a?"":"Please add your name so Megan knows who is writing.");setErr(txt,"e-text",b?"":"Please write a short message. One line is fine.");
     if(!a)nameEl.focus();else if(!b)txt.focus();if(!(a&&b))say("");return a&&b};
-  var msg=function(){return"Hi Megan, this is "+nameEl.value.trim()+". I’m interested in: "+sel.value+". "+txt.value.trim()};
+  var msg=function(){return"Hi Megan, this is "+clean(nameEl.value,80).trim()+". I’m interested in: "+sel.value+". "+clean(txt.value,1000).trim()};
   var phone=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(navigator.maxTouchPoints>1&&/Macintosh/.test(navigator.userAgent));
   sendB.addEventListener("click",function(){if(!valid())return;
     if(!phone){say("Texting only works from a phone. "+(C.EMAIL?"Use email, copy the message, or call":"Copy the message or call")+" +1 805-259-3980.");return}
-    location.href="sms:"+C.PHONE+"?&body="+encodeURIComponent(msg());say("Opening your messages app.")});
+    if(!C.PHONE){say("Texting is not set up. Please copy the message.");return}location.href="sms:"+C.PHONE+"?&body="+encodeURIComponent(msg());say("Opening your messages app.")});
   emailBtn.addEventListener("click",function(){if(!valid())return;
     location.href="mailto:"+C.EMAIL+"?subject="+encodeURIComponent("Macaw adoption question")+"&body="+encodeURIComponent(msg());
     say("Opening your email app. If nothing opens, copy the message and email "+C.EMAIL+".")});
   $("m-copy").addEventListener("click",function(){if(!valid())return;var m=msg();
-    var fb=function(){var ta=document.createElement("textarea");ta.value=m;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);say(ok?"Message copied.":"Could not copy. Select the text and copy it by hand.")};
+    var fb=function(){var ta=document.createElement("textarea");ta.value=m;ta.className="clip";ta.setAttribute("aria-hidden","true");document.body.appendChild(ta);ta.select();var ok=false;try{ok=document.execCommand("copy")}catch(e){}document.body.removeChild(ta);say(ok?"Message copied.":"Could not copy. Select the text and copy it by hand.")};
     if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(m).then(function(){say("Message copied.")},fb);else fb()});
 }
 

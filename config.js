@@ -1,4 +1,6 @@
-/* Edit these, then redeploy. Leave a value "" to hide it. Use full https:// links. */
+/* PUBLIC contact details only. Everything in this file is visible to every visitor.
+   Never put passwords, API keys or private data here.
+   Edit, then redeploy. Leave a value "" to hide it. Links must start with https://. */
 window.SITE={
   PHONE:"+18052593980",
   EMAIL:"",
